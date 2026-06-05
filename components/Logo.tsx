@@ -1,0 +1,24 @@
+// A graded-slab mark: the plastic case, a label strip, and a gem (gem-mint /
+// diamond hands). Reused as the header logo and the favicon (app/icon.svg).
+export function Logo({ size = 32 }: { size?: number }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 32 32"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden
+    >
+      <rect width="32" height="32" rx="7" fill="#0f141d" />
+      <rect x="7.5" y="3.5" width="17" height="25" rx="2.6" fill="#1c2433" />
+      <rect x="8.5" y="4.5" width="15" height="23" rx="2" fill="#f4f4f5" />
+      {/* label strip */}
+      <rect x="10.5" y="6.4" width="11" height="2.7" rx="1.35" fill="#ff7ab8" />
+      {/* gem */}
+      <path d="M16 12.6 20.2 18 16 24.4 11.8 18 Z" fill="#f5c451" />
+      <path d="M16 12.6 20.2 18 16 24.4 11.8 18 Z" stroke="#0f141d" strokeOpacity="0.18" strokeWidth="0.8" strokeLinejoin="round" />
+      <path d="M11.8 18H20.2M16 12.6V24.4" stroke="#0f141d" strokeOpacity="0.18" strokeWidth="0.7" />
+    </svg>
+  );
+}

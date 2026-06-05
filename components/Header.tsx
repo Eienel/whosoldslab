@@ -1,11 +1,11 @@
+import { Logo } from "./Logo";
+
 export function Header() {
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-ink/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:px-6">
         <div className="flex items-center gap-2.5">
-          <div className="grid h-8 w-8 place-items-center rounded-md border border-pink/40 bg-pink/10 text-base">
-            🪪
-          </div>
+          <Logo size={30} />
           <div className="font-mono text-sm font-bold tracking-[0.16em] text-foreground">
             WHO<span className="text-pink">SOLD</span>SLAB
           </div>
