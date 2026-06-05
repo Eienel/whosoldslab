@@ -151,7 +151,13 @@ export function WinnersGallery({ records }: { records: SlabRecord[] }) {
 
       {rows.length === 0 ? (
         <div className="rounded-lg border border-line bg-surface py-16 text-center font-mono text-sm text-faint">
-          No winners match.
+          {q.trim()
+            ? "No winners match your search."
+            : filter === "sold"
+              ? "No one's sold yet. Every tracked winner is still holding their slab 💎"
+              : filter === "holding"
+                ? "No winners are currently holding."
+                : "No winners yet."}
         </div>
       ) : (
         <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
