@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -7,8 +7,8 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const jetbrains = JetBrains_Mono({
+  variable: "--font-jetbrains",
   subsets: ["latin"],
 });
 
@@ -20,20 +20,20 @@ const siteUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: "Who Sold Slab — Diamond Hands vs Paper Hands",
+  title: "Who Sold Slab",
   description:
-    "Track every SlabDrop winner and see who sold the slab they won versus who's still holding.",
+    "Live tracker for SlabDrop winners: the real cards won, their value, and who's holding versus who sold.",
   openGraph: {
     title: "Who Sold Slab",
     description:
-      "Who flipped the slab they won, and who's still holding? Live winner tracking for SlabDrop.",
+      "Live tracker for SlabDrop winners: who's holding the slab they won, who sold it.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Who Sold Slab",
     description:
-      "Who flipped the slab they won, and who's still holding? Live winner tracking for SlabDrop.",
+      "Live tracker for SlabDrop winners: who's holding the slab they won, who sold it.",
   },
 };
 
@@ -45,7 +45,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${jetbrains.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

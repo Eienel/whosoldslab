@@ -1,42 +1,32 @@
 import { SlabRecord } from "@/lib/data";
 
 export function StatusBadge({ status }: { status: SlabRecord["status"] }) {
-  if (status === "holding") {
+  if (status === "sold") {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-hold/30 bg-hold/10 px-2.5 py-0.5 text-[11px] font-semibold text-hold">
-        <span className="text-[9px]">💎</span> HOLDING
+      <span className="inline-flex items-center gap-1 rounded border border-sold/40 bg-sold/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-sold">
+        SOLD
+      </span>
+    );
+  }
+  if (status === "redeemed") {
+    return (
+      <span className="inline-flex items-center gap-1 rounded border border-blue/40 bg-blue/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-blue">
+        REDEEMED
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-sold/30 bg-sold/10 px-2.5 py-0.5 text-[11px] font-semibold text-sold">
-      <span className="text-[9px]">📄</span> SOLD
+    <span className="inline-flex items-center gap-1 rounded border border-hold/40 bg-hold/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-hold">
+      HOLDING
     </span>
   );
 }
 
-// Deterministic gradient swatch keyed off the card name — stands in for the
-// real slab photo while keeping the grid colorful and stable.
-const PALETTES = [
-  ["#f5c451", "#d9a032"],
-  ["#fb7185", "#9f1239"],
-  ["#60a5fa", "#1e40af"],
-  ["#34d399", "#065f46"],
-  ["#c084fc", "#6b21a8"],
-  ["#f97316", "#7c2d12"],
-];
-
-export function SlabAvatar({ card, grade }: { card: string; grade: string }) {
-  let h = 0;
-  for (let i = 0; i < card.length; i++) h = (h * 31 + card.charCodeAt(i)) >>> 0;
-  const [a, b] = PALETTES[h % PALETTES.length];
+export function GraderTag({ grader, grade }: { grader?: string; grade?: string }) {
+  if (!grader) return null;
   return (
-    <div
-      className="grid h-10 w-8 shrink-0 place-items-center rounded-[3px] border border-white/10 text-[9px] font-bold text-black/70 shadow-inner"
-      style={{ background: `linear-gradient(140deg, ${a}, ${b})` }}
-      aria-hidden
-    >
-      {grade}
-    </div>
+    <span className="rounded border border-line-2 bg-ink px-1.5 py-0.5 font-mono text-[10px] font-semibold text-gold">
+      {grader} {grade}
+    </span>
   );
 }

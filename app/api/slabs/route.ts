@@ -1,10 +1,14 @@
 import { NextResponse } from "next/server";
-import { getSlabRecords, computeStats } from "@/lib/data";
+import { getSlabRecords, getLiveWindow, computeStats } from "@/lib/data";
 
-// JSON feed of the same data the dashboard renders. Useful for embeds / bots.
-export function GET() {
-  const records = getSlabRecords();
+export const revalidate = 120;
+
+// JSON feed of the same live data the dashboard renders.
+export async function GET() {
+  const [records, live] = await Promise.all([getSlabRecords(), getLiveWindow()]);
   return NextResponse.json({
+    source: "https://slabdrop.io/api",
+    live,
     stats: computeStats(records),
     records,
   });
