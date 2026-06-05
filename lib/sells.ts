@@ -1,32 +1,37 @@
 import { SlabStatus } from "./data";
+import seed from "@/data/confirmed-sells.json";
 
 // Confirmed sell-backs / redemptions.
 //
-// There is currently NO public, per-winner "sold" signal for SlabDrop:
-//   - won slabs are custodied by SlabDrop / phygitals.com, so they never land
-//     in the winner's own wallet (nothing on-chain to watch leave),
-//   - phygitals' listing database is not openly queryable,
-//   - the buyback payout has no shared on-chain wallet to fingerprint.
-//
-// So we only ever flag a winner as SOLD / REDEEMED when a sale is INDEPENDENTLY
-// CONFIRMED. Add an entry here when that happens (a SlabDrop sold flag, a
-// verified phygitals relist, an on-chain buyback the winner confirms, etc).
-// We never label a real wallet as a seller on a guess.
-//
-// Keyed by drawId.
+// These are PROVEN, not guessed. The scheduled watcher (scripts/watch.mjs,
+// run by .github/workflows/watch.yml) accumulates the winner feed over time and
+// flags a winner as SOLD when the exact slab they won is re-dropped in a later
+// draw (the same per-item photo reappears), which means the slab went back into
+// SlabDrop's pool, i.e. the winner sold it back. The watcher commits its
+// findings to data/confirmed-sells.json; we read that file here.
 export interface ConfirmedSell {
   drawId: number;
   status: Exclude<SlabStatus, "holding">; // "sold" | "redeemed"
-  soldAt?: string; // ISO
+  soldAt?: string;
   salePriceUsd?: number;
-  source: string; // how it was verified (url / note) — shown nowhere, audit only
+  source: string;
 }
 
-export const CONFIRMED_SELLS: ConfirmedSell[] = [
-  // Example shape (commented out — no real sale has been verified yet):
-  // { drawId: 7, status: "sold", soldAt: "2026-06-05T18:00:00Z", salePriceUsd: 225, source: "winner posted phygitals receipt" },
-];
+// Pull the freshest findings straight from the repo so the cron's commits show
+// up without needing a redeploy; fall back to the version bundled at build.
+const RAW_URL =
+  "https://raw.githubusercontent.com/Eienel/whosoldslab/claude/friendly-rubin-hCoCk/data/confirmed-sells.json";
 
-export function confirmedByDraw(): Map<number, ConfirmedSell> {
-  return new Map(CONFIRMED_SELLS.map((c) => [c.drawId, c]));
+export async function getConfirmedSells(): Promise<Map<number, ConfirmedSell>> {
+  let list = seed as ConfirmedSell[];
+  try {
+    const res = await fetch(RAW_URL, { next: { revalidate: 120 } });
+    if (res.ok) {
+      const fresh = (await res.json()) as ConfirmedSell[];
+      if (Array.isArray(fresh)) list = fresh;
+    }
+  } catch {
+    /* use bundled seed */
+  }
+  return new Map(list.map((c) => [c.drawId, c]));
 }

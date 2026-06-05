@@ -14,7 +14,7 @@
 // Card images are served via SlabDrop's proxy (/api/img), which fronts the
 // phygitals.com / Supabase storage the slabs actually live on.
 
-import { confirmedByDraw } from "./sells";
+import { getConfirmedSells } from "./sells";
 
 export const SLAB_BASE = "https://slabdrop.io";
 
@@ -109,13 +109,13 @@ async function safeJson<T>(url: string): Promise<T | null> {
 }
 
 export async function getSlabRecords(): Promise<SlabRecord[]> {
-  const [winnersRes, drawsRes] = await Promise.all([
+  const [winnersRes, drawsRes, confirmed] = await Promise.all([
     safeJson<{ winners: RawWinner[] } | RawWinner[]>(`${SLAB_BASE}/api/winners?limit=100`),
     safeJson<RawDraw[]>(`${SLAB_BASE}/api/draws`),
+    getConfirmedSells(),
   ]);
 
   const winners = (Array.isArray(winnersRes) ? winnersRes : winnersRes?.winners) ?? [];
-  const confirmed = confirmedByDraw();
   const oddsByDraw = new Map<number, number>();
   (drawsRes ?? []).forEach((d) => {
     if (d.winner?.odds != null) oddsByDraw.set(d.id, d.winner.odds);

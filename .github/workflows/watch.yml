@@ -1,0 +1,42 @@
+name: slab-watch
+
+# Accumulates the SlabDrop winner feed over time and records confirmed sells
+# (a won slab re-dropped in a later draw). Commits findings to data/.
+#
+# NOTE: GitHub only fires `schedule` from the repository's DEFAULT branch, so
+# the 30-minute cron activates once this workflow is on the default branch.
+# Until then, run it manually via "Run workflow" (workflow_dispatch).
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: slab-watch
+  cancel-in-progress: false
+
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Run watcher
+        run: node scripts/watch.mjs
+      - name: Commit findings
+        run: |
+          git config user.name "slab-watch[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --cached --quiet; then
+            echo "no changes"
+          else
+            git commit -m "watch: update winner history + confirmed sells"
+            git push
+          fi
