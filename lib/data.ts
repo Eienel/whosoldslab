@@ -14,6 +14,8 @@
 // Card images are served via SlabDrop's proxy (/api/img), which fronts the
 // phygitals.com / Supabase storage the slabs actually live on.
 
+import { confirmedByDraw } from "./sells";
+
 export const SLAB_BASE = "https://slabdrop.io";
 
 export type SlabStatus = "holding" | "sold" | "redeemed";
@@ -93,11 +95,6 @@ function parseCard(name: string) {
   };
 }
 
-// Sells that have been independently confirmed (e.g. SlabDrop exposing a flag,
-// or a verified phygitals relist). Empty for now: we never label a real wallet
-// as a seller without evidence. Keyed by `${drawId}`.
-const CONFIRMED: Record<string, { status: SlabStatus; soldAt?: string; salePriceUsd?: number }> = {};
-
 async function safeJson<T>(url: string): Promise<T | null> {
   try {
     const res = await fetch(url, {
@@ -118,6 +115,7 @@ export async function getSlabRecords(): Promise<SlabRecord[]> {
   ]);
 
   const winners = (Array.isArray(winnersRes) ? winnersRes : winnersRes?.winners) ?? [];
+  const confirmed = confirmedByDraw();
   const oddsByDraw = new Map<number, number>();
   (drawsRes ?? []).forEach((d) => {
     if (d.winner?.odds != null) oddsByDraw.set(d.id, d.winner.odds);
@@ -126,7 +124,7 @@ export async function getSlabRecords(): Promise<SlabRecord[]> {
   return winners.map((w): SlabRecord => {
     const c = w.cards?.[0];
     const parsed = parseCard(c?.name ?? "Unknown slab");
-    const conf = CONFIRMED[String(w.drawId)];
+    const conf = confirmed.get(w.drawId);
     return {
       id: `draw-${w.drawId}`,
       drawId: w.drawId,
