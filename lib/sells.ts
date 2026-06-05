@@ -20,7 +20,7 @@ export interface ConfirmedSell {
 // Pull the freshest findings straight from the repo so the cron's commits show
 // up without needing a redeploy; fall back to the version bundled at build.
 const RAW_URL =
-  "https://raw.githubusercontent.com/Eienel/whosoldslab/claude/friendly-rubin-hCoCk/data/confirmed-sells.json";
+  "https://raw.githubusercontent.com/Eienel/whosoldslab/main/data/confirmed-sells.json";
 
 export async function getConfirmedSells(): Promise<Map<number, ConfirmedSell>> {
   let list = seed as ConfirmedSell[];
