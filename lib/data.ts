@@ -110,9 +110,20 @@ async function safeJson<T>(url: string): Promise<T | null> {
 
 // Full accumulated winner history, collected by the scheduled watcher and
 // committed to the repo. The live API only returns a rolling window, so this is
-// how the board keeps every draw it has ever seen.
-const HISTORY_URL =
-  "https://raw.githubusercontent.com/Eienel/whosoldslab/main/data/history.json";
+// how the board keeps every draw it has ever seen. Served via jsDelivr's CDN
+// (reliable from serverless) with a raw.githubusercontent fallback.
+const HISTORY_URLS = [
+  "https://cdn.jsdelivr.net/gh/Eienel/whosoldslab@main/data/history.json",
+  "https://raw.githubusercontent.com/Eienel/whosoldslab/main/data/history.json",
+];
+
+async function getHistory(): Promise<{ draws: Record<string, HistoryDraw> } | null> {
+  for (const url of HISTORY_URLS) {
+    const data = await safeJson<{ draws: Record<string, HistoryDraw> }>(url);
+    if (data?.draws) return data;
+  }
+  return null;
+}
 
 interface HistoryDraw {
   drawId: number;
@@ -127,7 +138,7 @@ export async function getSlabRecords(): Promise<SlabRecord[]> {
   const [winnersRes, drawsRes, historyRes, confirmed] = await Promise.all([
     safeJson<{ winners: RawWinner[] } | RawWinner[]>(`${SLAB_BASE}/api/winners?limit=100`),
     safeJson<RawDraw[]>(`${SLAB_BASE}/api/draws`),
-    safeJson<{ draws: Record<string, HistoryDraw> }>(HISTORY_URL),
+    getHistory(),
     getConfirmedSells(),
   ]);
 
