@@ -28,6 +28,13 @@
     "source": "re-dropped at draw #151 (same slab back in the pool)"
   },
   {
+    "drawId": 44,
+    "status": "sold",
+    "soldAt": "2026-06-08T00:16:46.434Z",
+    "salePriceUsd": 17.82,
+    "source": "re-dropped at draw #233 (same slab back in the pool)"
+  },
+  {
     "drawId": 33,
     "status": "sold",
     "soldAt": "2026-06-06T06:27:27.908Z",
