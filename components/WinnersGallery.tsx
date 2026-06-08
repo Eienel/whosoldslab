@@ -28,6 +28,7 @@ function Card({ r }: { r: SlabRecord }) {
           <img
             src={r.card.image}
             alt={r.card.fullName}
+            loading="lazy"
             className="h-full w-full object-contain"
           />
         ) : (

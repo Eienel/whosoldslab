@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getSlabRecords, getLiveWindow, computeStats } from "@/lib/data";
 
-export const revalidate = 120;
+export const dynamic = "force-dynamic";
 
 // JSON feed of the same live data the dashboard renders.
 export async function GET() {

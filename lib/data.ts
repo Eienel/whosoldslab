@@ -99,7 +99,7 @@ async function safeJson<T>(url: string): Promise<T | null> {
   try {
     const res = await fetch(url, {
       headers: { Accept: "application/json", "User-Agent": "who-sold-slab" },
-      next: { revalidate: 120 },
+      cache: "no-store",
     });
     if (!res.ok) return null;
     return (await res.json()) as T;
@@ -108,10 +108,26 @@ async function safeJson<T>(url: string): Promise<T | null> {
   }
 }
 
+// Full accumulated winner history, collected by the scheduled watcher and
+// committed to the repo. The live API only returns a rolling window, so this is
+// how the board keeps every draw it has ever seen.
+const HISTORY_URL =
+  "https://raw.githubusercontent.com/Eienel/whosoldslab/main/data/history.json";
+
+interface HistoryDraw {
+  drawId: number;
+  wallet: string;
+  wonAt: string;
+  value: number;
+  name: string;
+  image: string;
+}
+
 export async function getSlabRecords(): Promise<SlabRecord[]> {
-  const [winnersRes, drawsRes, confirmed] = await Promise.all([
+  const [winnersRes, drawsRes, historyRes, confirmed] = await Promise.all([
     safeJson<{ winners: RawWinner[] } | RawWinner[]>(`${SLAB_BASE}/api/winners?limit=100`),
     safeJson<RawDraw[]>(`${SLAB_BASE}/api/draws`),
+    safeJson<{ draws: Record<string, HistoryDraw> }>(HISTORY_URL),
     getConfirmedSells(),
   ]);
 
@@ -121,31 +137,48 @@ export async function getSlabRecords(): Promise<SlabRecord[]> {
     if (d.winner?.odds != null) oddsByDraw.set(d.id, d.winner.odds);
   });
 
-  return winners.map((w): SlabRecord => {
+  // Merge: start from the full accumulated history, then overlay the live feed
+  // (fresher, and catches draws newer than the last watcher run). Keyed by draw.
+  const merged = new Map<number, HistoryDraw>();
+  Object.values(historyRes?.draws ?? {}).forEach((d) => merged.set(d.drawId, d));
+  winners.forEach((w) => {
     const c = w.cards?.[0];
-    const parsed = parseCard(c?.name ?? "Unknown slab");
-    const conf = confirmed.get(w.drawId);
-    return {
-      id: `draw-${w.drawId}`,
+    merged.set(w.drawId, {
       drawId: w.drawId,
       wallet: w.wallet,
       wonAt: w.wonAt,
-      prizeValueUsd: w.value,
-      sellbackUsd: Math.round(w.value * BUYBACK * 100) / 100,
-      odds: oddsByDraw.get(w.drawId),
-      slabCount: w.slabCount ?? 1,
-      card: {
-        fullName: c?.name ?? "Unknown slab",
-        ...parsed,
-        image: absImage(c?.image ?? ""),
-      },
-      // Presumed holding until a sale is independently confirmed. We do not
-      // fabricate "sold" for real wallets.
-      status: conf?.status ?? "holding",
-      soldAt: conf?.soldAt,
-      salePriceUsd: conf?.salePriceUsd,
-    };
+      value: w.value,
+      name: c?.name ?? "Unknown slab",
+      image: c?.image ?? "",
+    });
   });
+
+  return [...merged.values()]
+    .sort((a, b) => b.drawId - a.drawId)
+    .map((d): SlabRecord => {
+      const parsed = parseCard(d.name);
+      const conf = confirmed.get(d.drawId);
+      return {
+        id: `draw-${d.drawId}`,
+        drawId: d.drawId,
+        wallet: d.wallet,
+        wonAt: d.wonAt,
+        prizeValueUsd: d.value,
+        sellbackUsd: Math.round(d.value * BUYBACK * 100) / 100,
+        odds: oddsByDraw.get(d.drawId),
+        slabCount: 1,
+        card: {
+          fullName: d.name,
+          ...parsed,
+          image: absImage(d.image),
+        },
+        // Presumed holding until a sale is independently confirmed. We do not
+        // fabricate "sold" for real wallets.
+        status: conf?.status ?? "holding",
+        soldAt: conf?.soldAt,
+        salePriceUsd: conf?.salePriceUsd,
+      };
+    });
 }
 
 export async function getLiveWindow(): Promise<LiveWindow | null> {

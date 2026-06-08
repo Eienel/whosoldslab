@@ -6,7 +6,7 @@ import { WinnersGallery } from "@/components/WinnersGallery";
 import { getSlabRecords, getLiveWindow, computeStats } from "@/lib/data";
 import { usd } from "@/lib/format";
 
-export const revalidate = 120;
+export const dynamic = "force-dynamic";
 
 export default async function Home() {
   const [records, live] = await Promise.all([getSlabRecords(), getLiveWindow()]);

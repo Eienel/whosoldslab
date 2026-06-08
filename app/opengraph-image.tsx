@@ -4,7 +4,7 @@ import { getSlabRecords, computeStats } from "@/lib/data";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 export const alt = "Who Sold Slab";
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 
 function usdC(n: number) {
   return n >= 10000
