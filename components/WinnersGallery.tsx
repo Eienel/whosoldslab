@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { SlabRecord, solscanWallet } from "@/lib/data";
 import { truncateWallet, usd, relativeTime, oddsLabel } from "@/lib/format";
 import { StatusBadge, GraderTag } from "./ui";
@@ -82,10 +82,18 @@ function Card({ r }: { r: SlabRecord }) {
   );
 }
 
+const PAGE = 24;
+
 export function WinnersGallery({ records }: { records: SlabRecord[] }) {
   const [filter, setFilter] = useState<Filter>("all");
   const [sort, setSort] = useState<SortKey>("recent");
   const [q, setQ] = useState("");
+  const [visible, setVisible] = useState(PAGE);
+
+  // Reset back to the first page whenever the filtering/sorting changes.
+  useEffect(() => {
+    setVisible(PAGE);
+  }, [filter, sort, q]);
 
   const rows = useMemo(() => {
     const needle = q.trim().toLowerCase();
@@ -161,15 +169,30 @@ export function WinnersGallery({ records }: { records: SlabRecord[] }) {
                 : "No winners yet."}
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
-          {rows.map((r) => (
-            <Card key={r.id} r={r} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+            {rows.slice(0, visible).map((r) => (
+              <Card key={r.id} r={r} />
+            ))}
+          </div>
+
+          {visible < rows.length && (
+            <div className="mt-5 flex justify-center">
+              <button
+                onClick={() => setVisible((v) => v + PAGE)}
+                className="rounded-md border border-line-2 bg-surface px-5 py-2.5 font-mono text-sm text-muted transition-colors hover:border-pink/50 hover:text-foreground"
+              >
+                Load more ({rows.length - visible} left)
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       <div className="mt-4 font-mono text-[11px] text-faint">
-        Showing {rows.length} of {records.length} tracked winners. Live from slabdrop.io/api.
+        Showing {Math.min(visible, rows.length)} of {rows.length}
+        {rows.length !== records.length ? ` (filtered from ${records.length})` : ""} tracked winners.
+        Live from slabdrop.io/api.
       </div>
     </section>
   );
