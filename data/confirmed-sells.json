@@ -7,6 +7,13 @@
     "source": "re-dropped at draw #363 (same slab back in the pool)"
   },
   {
+    "drawId": 295,
+    "status": "sold",
+    "soldAt": "2026-06-09T21:07:06.994Z",
+    "salePriceUsd": 13.08,
+    "source": "re-dropped at draw #385 (same slab back in the pool)"
+  },
+  {
     "drawId": 224,
     "status": "sold",
     "soldAt": "2026-06-09T10:37:04.799Z",
@@ -33,6 +40,13 @@
     "soldAt": "2026-06-08T08:36:50.076Z",
     "salePriceUsd": 18.61,
     "source": "re-dropped at draw #239 (same slab back in the pool)"
+  },
+  {
+    "drawId": 183,
+    "status": "sold",
+    "soldAt": "2026-06-09T21:52:06.467Z",
+    "salePriceUsd": 10.52,
+    "source": "re-dropped at draw #388 (same slab back in the pool)"
   },
   {
     "drawId": 179,
@@ -68,6 +82,13 @@
     "soldAt": "2026-06-09T10:07:05.007Z",
     "salePriceUsd": 19.2,
     "source": "re-dropped at draw #341 (same slab back in the pool)"
+  },
+  {
+    "drawId": 81,
+    "status": "sold",
+    "soldAt": "2026-06-09T20:37:06.994Z",
+    "salePriceUsd": 34.54,
+    "source": "re-dropped at draw #383 (same slab back in the pool)"
   },
   {
     "drawId": 74,
