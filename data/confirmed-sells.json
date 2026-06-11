@@ -1,5 +1,12 @@
 [
   {
+    "drawId": 410,
+    "status": "sold",
+    "soldAt": "2026-06-11T21:37:40.896Z",
+    "salePriceUsd": 30.16,
+    "source": "re-dropped at draw #579 (same slab back in the pool)"
+  },
+  {
     "drawId": 409,
     "status": "sold",
     "soldAt": "2026-06-10T06:52:07.848Z",
@@ -131,6 +138,13 @@
     "soldAt": "2026-06-09T20:37:06.994Z",
     "salePriceUsd": 34.54,
     "source": "re-dropped at draw #383 (same slab back in the pool)"
+  },
+  {
+    "drawId": 80,
+    "status": "sold",
+    "soldAt": "2026-06-11T21:52:40.528Z",
+    "salePriceUsd": 27.74,
+    "source": "re-dropped at draw #580 (same slab back in the pool)"
   },
   {
     "drawId": 74,
